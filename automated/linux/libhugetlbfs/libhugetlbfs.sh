@@ -68,12 +68,19 @@ parse_output() {
 }
 
 libhugetlbfs_setup() {
-    mount_point="/mnt/hugetlb/"
     # Allocate hugepages
-    echo 200 > /proc/sys/vm/nr_hugepages
+    # 2M pages
+    mount_point="/mnt/hugetlb-2M/"
+    echo 200 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
     umount "${mount_point}" > /dev/null 2>&1 || true
     mkdir -p "${mount_point}"
-    mount -t hugetlbfs hugetlbfs "${mount_point}"
+    mount -t hugetlbfs hugetlbfs -o pagesize=2M "${mount_point}"
+    # 64K pages
+    mount_point="/mnt/hugetlb-64K/"
+    echo 200 > /sys/kernel/mm/hugepages/hugepages-64kB/nr_hugepages
+    umount "${mount_point}" > /dev/null 2>&1 || true
+    mkdir -p "${mount_point}"
+    mount -t hugetlbfs hugetlbfs -o pagesize=64kB "${mount_point}"
 }
 
 libhugetlbfs_cleanup() {
